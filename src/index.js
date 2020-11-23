@@ -1,17 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import { Provider as StoreProvider } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./component/App/App";
+import store from "./store/store";
+import ServiceContext from "./component/context/ServiceContext";
+import NewsService from "./service/NewsService";
+import Layout from "./component/Layout/Layout";
+
+const newsService = new NewsService();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ServiceContext.Provider value={newsService}>
+      <StoreProvider store={store}>
+        <BrowserRouter basename="/hacker-news">
+          <Layout>
+            <App />
+          </Layout>
+        </BrowserRouter>
+      </StoreProvider>
+    </ServiceContext.Provider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
