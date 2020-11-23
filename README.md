@@ -4,5 +4,5 @@
 - Т.к. в API предлагают вставлять HTML код, использовал "санитайзер" dompurify.
 - В свежих новостях с API нет ни текста, ни комментариев, но можно вручную вбить ID какой-нибудь старой новости, например 121003, там много ветвящихся комментариев :)
 
-GH-Pages: https://snaaaaaaake.github.io/hacker-news/
+GH-Pages: https://snaaaaaaake.github.io/hacker-news/  
 Запустить локально: npm start
