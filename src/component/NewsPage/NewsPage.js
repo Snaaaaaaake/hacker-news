@@ -52,10 +52,10 @@ const NewsPage = (props) => {
 
   return error ? (
     <ErrorComponent error={error} />
-  ) : isLoading || !news ? (
+  ) : isLoading ? (
     <Spinner />
-  ) : news.type !== "story" ? (
-    <ErrorComponent error={new Error("Неверный адрес!")} />
+  ) : !news || news.type !== "story" ? (
+    <ErrorComponent error={new Error("404: нет такой новости!")} />
   ) : (
     <>
       <Divider className={classes.divider} />

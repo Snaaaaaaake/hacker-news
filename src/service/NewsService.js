@@ -5,15 +5,8 @@ function checkRes(res) {
     throw new Error(res.status);
   }
 }
-function nullCheck(res) {
-  if (res) {
-    return res;
-  } else {
-    throw new Error("404: нет такой страницы!");
-  }
-}
 function editItem(res) {
-  if (!res.kids) res.kids = [];
+  if (res && !res.kids) res.kids = [];
   return res;
 }
 
@@ -29,7 +22,7 @@ export default class NewsService {
   };
 
   getSingleItem = (id) => {
-    return fetch(`${this.apiUrl}/v0/item/${id}.json`).then(checkRes).then(nullCheck).then(editItem);
+    return fetch(`${this.apiUrl}/v0/item/${id}.json`).then(checkRes).then(editItem);
   };
 
   getListFromIds = (ids) => {
