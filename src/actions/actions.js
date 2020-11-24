@@ -30,7 +30,7 @@ const fetchListThunkAction = (service, fetchCondition) => (dispatch) => {
         if (finalList.length < service.listLength) fetchPack(list);
       }
     } catch (error) {
-      throw error;
+      throw dispatch(fetchListFailureAction(error));
     }
   }
   dispatch(fetchListRequestAction());
@@ -44,23 +44,19 @@ const fetchListThunkAction = (service, fetchCondition) => (dispatch) => {
     .catch((error) => dispatch(fetchListFailureAction(error)));
 };
 
-const fetchShadowReloadListThunkAction = (service, fetchCondition) => (dispatch, getState) => {
-  service
-    .getRawList()
-    .then(async (rawList) => {
-      try {
-        const newIdsList = rawList.slice(0, service.listLength);
-        const oldIdsList = getState().listState.ids;
-        if (!compareArrays(newIdsList, oldIdsList) && !fetchCondition.canceled) {
-          const newItemList = await service.getListFromIds(newIdsList);
-          dispatch(fetchListSuccessAction(newItemList));
-          dispatch(saveIdsAction(newIdsList));
-        }
-      } catch (error) {
-        throw error;
-      }
-    })
-    .catch((error) => dispatch(fetchListFailureAction(error)));
+const fetchShadowReloadListThunkAction = (service, fetchCondition) => async (dispatch, getState) => {
+  try {
+    const rawList = await service.getRawList();
+    const newIdsList = rawList.slice(0, service.listLength);
+    const oldIdsList = getState().listState.ids;
+    if (!compareArrays(newIdsList, oldIdsList) && !fetchCondition.canceled) {
+      const newItemList = await service.getListFromIds(newIdsList);
+      dispatch(fetchListSuccessAction(newItemList));
+      dispatch(saveIdsAction(newIdsList));
+    }
+  } catch (error) {
+    dispatch(fetchListFailureAction(error));
+  }
 };
 
 const fetchSingleNewsRequestAction = () => ({
@@ -99,23 +95,24 @@ const fetchCommentsFailureAction = (data) => ({
 
 const fetchCommentListThunkAction = (service, fetchCondition, ids) => (dispatch) => {
   dispatch(fetchCommentsRequestAction());
-  !ids
-    ? dispatch(fetchCommentsSuccessAction([]))
-    : service
-        .getListFromIds(ids)
-        .then((data) => {
-          if (!fetchCondition.canceled) dispatch(fetchCommentsSuccessAction(data));
-        })
-        .catch((error) => dispatch(fetchCommentsFailureAction(error)));
+  service
+    .getListFromIds(ids)
+    .then((data) => {
+      if (!fetchCondition.canceled) dispatch(fetchCommentsSuccessAction(data));
+    })
+    .catch((error) => dispatch(fetchCommentsFailureAction(error)));
 };
 
-const fetchShadowReloadCommentListThunkAction = (service, fetchCondition) => (dispatch, getState) => {
-  const oldNews = getState().singleNewsState.news;
-  service.getSingleItem(oldNews.id).then((newNews) => {
+const fetchShadowReloadCommentListThunkAction = (service, fetchCondition) => async (dispatch, getState) => {
+  try {
+    const oldNews = getState().singleNewsState.news;
+    const newNews = await service.getSingleItem(oldNews.id);
     if (oldNews.descendants !== newNews.descendants && !fetchCondition.canceled) {
       dispatch(fetchSingleNewsSuccessAction(newNews));
     }
-  });
+  } catch (error) {
+    dispatch(fetchCommentsFailureAction(error));
+  }
 };
 
 const fetchCommentTreeThunkAction = (service, fetchCondition, ids, parent, setExtendedComment) => (
