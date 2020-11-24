@@ -28,7 +28,7 @@ const CommentCard = (props) => {
           </Typography>
         </Box>
       </Box>
-      {comment.kids &&
+      {comment.kids.length > 0 &&
         (!comment.extendedKids ? (
           isExtended ? (
             <LinearProgress className={classes.spinner} />

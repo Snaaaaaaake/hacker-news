@@ -112,11 +112,7 @@ const fetchCommentListThunkAction = (service, fetchCondition, ids) => (dispatch)
 const fetchShadowReloadCommentListThunkAction = (service, fetchCondition) => (dispatch, getState) => {
   const oldNews = getState().singleNewsState.news;
   service.getSingleItem(oldNews.id).then((newNews) => {
-    if (
-      oldNews.descendants !== newNews.descendants &&
-      !compareArrays(oldNews.kids, newNews.kids) &&
-      !fetchCondition.canceled
-    ) {
+    if (oldNews.descendants !== newNews.descendants && !fetchCondition.canceled) {
       dispatch(fetchSingleNewsSuccessAction(newNews));
     }
   });
@@ -130,7 +126,7 @@ const fetchCommentTreeThunkAction = (service, fetchCondition, ids, parent, setEx
     try {
       const commentList = await service.getListFromIds(ids);
       const extendedCommentListPromiseArray = commentList.map(async (comment) => {
-        if (comment.kids) comment.extendedKids = await getCommentTree(comment.kids);
+        if (comment.kids.length > 0) comment.extendedKids = await getCommentTree(comment.kids);
         return comment;
       });
       return Promise.all(extendedCommentListPromiseArray);

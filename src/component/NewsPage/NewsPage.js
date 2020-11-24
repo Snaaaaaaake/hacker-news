@@ -89,7 +89,7 @@ const NewsPage = (props) => {
           Обновить комментарии
         </Button>
       </Box>
-      <CommentList idList={news.kids} />
+      <CommentList />
     </>
   );
 };
